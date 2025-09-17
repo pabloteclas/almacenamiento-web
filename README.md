@@ -27,3 +27,16 @@ No se requieren instalaciones locales ni uso de terminal.
 4. Vercel detectará automáticamente que es un proyecto estático.
 5. Haz clic en **Deploy**.
 6. En pocos segundos tendrás un enlace público, por ejemplo:  
+
+Cada vez que edites los archivos en GitHub (por ejemplo, `index.html`), Vercel redeployará automáticamente y tu web se actualizará.
+
+---
+
+## 👨‍🏫 Objetivo educativo
+La web permite a estudiantes aprender sobre diferentes tipos de almacenamiento de datos mediante:
+- Ejemplos visuales
+- Comparaciones en tabla
+- Definiciones en glosario
+- Un pequeño quiz de repaso
+
+---
