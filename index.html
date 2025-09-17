@@ -8,16 +8,17 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
-  <header class="bg-blue-600 text-white py-6">
+
+  <header class="bg-blue-600 text-white py-6 shadow">
     <h1 class="text-3xl font-bold text-center">Tipos de Almacenamiento de Datos</h1>
   </header>
 
-  <main class="max-w-5xl mx-auto p-6 space-y-12">
+  <main class="max-w-6xl mx-auto p-6 space-y-12">
 
     <!-- Filtro -->
     <section>
       <h2 class="text-2xl font-semibold mb-4">🔎 Filtro</h2>
-      <input type="text" id="filterInput" placeholder="Filtra tarjetas por palabra clave..." 
+      <input type="text" id="filterInput" placeholder="Filtra tarjetas por tipo, uso o descripción..." 
         class="w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
     </section>
 
@@ -62,10 +63,11 @@
 
   </main>
 
-  <footer class="bg-gray-200 text-center py-4">
+  <footer class="bg-gray-200 text-center py-4 mt-12">
     <p>&copy; 2025 Web educativa sobre almacenamiento de datos</p>
   </footer>
 
+  <!-- ================== Script JS ================== -->
   <script>
     // ================== Datos ==================
     const items = [
@@ -97,82 +99,102 @@
       { enunciado:"¿Qué tipo de almacenamiento es más adecuado para archivado de muy largo plazo?", opciones:["SSD NVMe","Cinta/Archivado","BD relacional"], correcta:"Cinta/Archivado" }
     ];
 
-    // ================== Render dinámico ==================
-    const cardsContainer = document.getElementById("cards");
-    items.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "card bg-white shadow-md rounded-lg p-4";
-      div.dataset.keywords = Object.values(item).join(" ").toLowerCase();
-      div.innerHTML = `
-        <h3 class="text-lg font-bold">${item.tipo}</h3>
-        <p class="font-medium">Uso:</p><p>${item.uso}</p>
-        <p class="font-medium">Ejemplos:</p><p>${item.ejemplos}</p>
-        <p class="font-medium">Descripción:</p><p>${item.desc}</p>
-      `;
-      cardsContainer.appendChild(div);
-    });
+    // ================== Funciones ==================
 
-    // Tabla comparativa
-    const tableBody = document.querySelector("#comparisonTable tbody");
-    items.forEach(item => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td class="border px-4 py-2">${item.tipo}</td>
-        <td class="border px-4 py-2">${item.latencia}</td>
-        <td class="border px-4 py-2">${item.rendimiento}</td>
-        <td class="border px-4 py-2">${item.durabilidad}</td>
-        <td class="border px-4 py-2">${item.escalabilidad}</td>
-        <td class="border px-4 py-2">${item.coste}</td>
-      `;
-      tableBody.appendChild(tr);
-    });
-
-    // Glosario
-    const glossaryContainer = document.getElementById("glossary");
-    glosario.forEach(g => {
-      const div = document.createElement("div");
-      div.innerHTML = `<dt class="font-bold">${g.termino}</dt><dd>${g.definicion}</dd>`;
-      glossaryContainer.appendChild(div);
-    });
-
-    // Quiz
-    const quizForm = document.getElementById("quizForm");
-    preguntas.forEach((p, i) => {
-      const div = document.createElement("div");
-      div.innerHTML = `<p class="font-medium">${i+1}. ${p.enunciado}</p>`;
-      p.opciones.forEach(opt => {
-        const label = document.createElement("label");
-        label.className = "block";
-        label.innerHTML = `<input type="radio" name="q${i}" value="${opt}"> ${opt}`;
-        div.appendChild(label);
+    function renderCards(list) {
+      const container = document.getElementById("cards");
+      container.innerHTML = "";
+      list.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "card bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition-shadow duration-300";
+        div.dataset.keywords = (item.tipo + " " + item.uso + " " + item.desc).toLowerCase();
+        div.innerHTML = `
+          <h3 class="text-lg font-bold mb-2">${item.tipo}</h3>
+          <p class="font-medium">Uso:</p><p>${item.uso}</p>
+          <p class="font-medium mt-1">Ejemplos:</p><p>${item.ejemplos}</p>
+          <p class="font-medium mt-1">Descripción:</p><p>${item.desc}</p>
+        `;
+        container.appendChild(div);
       });
-      quizForm.appendChild(div);
-    });
-    const submitBtn = document.createElement("button");
-    submitBtn.type = "submit";
-    submitBtn.className = "bg-blue-600 text-white px-4 py-2 rounded-md";
-    submitBtn.textContent = "Enviar";
-    quizForm.appendChild(submitBtn);
+    }
 
-    const quizResult = document.getElementById("quizResult");
-    quizForm.addEventListener("submit", e => {
-      e.preventDefault();
-      let score = 0;
+    function renderTabla(list) {
+      const tbody = document.querySelector("#comparisonTable tbody");
+      tbody.innerHTML = "";
+      list.forEach(item => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="border px-4 py-2">${item.tipo}</td>
+          <td class="border px-4 py-2">${item.latencia}</td>
+          <td class="border px-4 py-2">${item.rendimiento}</td>
+          <td class="border px-4 py-2">${item.durabilidad}</td>
+          <td class="border px-4 py-2">${item.escalabilidad}</td>
+          <td class="border px-4 py-2">${item.coste}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function applyFilter() {
+      const query = document.getElementById("filterInput").value.toLowerCase();
+      const filtered = items.filter(item => 
+        item.tipo.toLowerCase().includes(query) ||
+        item.uso.toLowerCase().includes(query) ||
+        item.desc.toLowerCase().includes(query)
+      );
+      renderCards(filtered);
+    }
+
+    function renderGlossary() {
+      const container = document.getElementById("glossary");
+      container.innerHTML = "";
+      glosario.forEach(g => {
+        const div = document.createElement("div");
+        div.innerHTML = `<dt class="font-bold">${g.termino}</dt><dd>${g.definicion}</dd>`;
+        container.appendChild(div);
+      });
+    }
+
+    function initialize() {
+      renderCards(items);
+      renderTabla(items);
+      renderGlossary();
+
+      document.getElementById("filterInput").addEventListener("input", applyFilter);
+
+      const quizForm = document.getElementById("quizForm");
+      quizForm.innerHTML = "";
       preguntas.forEach((p,i) => {
-        const chosen = quizForm.querySelector(`input[name="q${i}"]:checked`);
-        if(chosen && chosen.value === p.correcta) score++;
+        const div = document.createElement("div");
+        div.innerHTML = `<p class="font-medium">${i+1}. ${p.enunciado}</p>`;
+        p.opciones.forEach(opt => {
+          const label = document.createElement("label");
+          label.className = "block";
+          label.innerHTML = `<input type="radio" name="q${i}" value="${opt}"> ${opt}`;
+          div.appendChild(label);
+        });
+        quizForm.appendChild(div);
       });
-      quizResult.textContent = `Has acertado ${score} de ${preguntas.length} preguntas.`;
-    });
+      const submitBtn = document.createElement("button");
+      submitBtn.type = "submit";
+      submitBtn.className = "bg-blue-600 text-white px-4 py-2 rounded-md mt-2";
+      submitBtn.textContent = "Enviar";
+      quizForm.appendChild(submitBtn);
 
-    // Filtro de tarjetas
-    const filterInput = document.getElementById("filterInput");
-    filterInput.addEventListener("input", () => {
-      const query = filterInput.value.toLowerCase();
-      document.querySelectorAll(".card").forEach(card => {
-        card.style.display = card.dataset.keywords.includes(query) ? "block" : "none";
+      const quizResult = document.getElementById("quizResult");
+      quizForm.addEventListener("submit", e => {
+        e.preventDefault();
+        let score = 0;
+        preguntas.forEach((p,i) => {
+          const chosen = quizForm.querySelector(`input[name="q${i}"]:checked`);
+          if(chosen && chosen.value === p.correcta) score++;
+        });
+        quizResult.textContent = `Has acertado ${score} de ${preguntas.length} preguntas.`;
       });
-    });
+    }
+
+    window.addEventListener("DOMContentLoaded", initialize);
   </script>
+
 </body>
 </html>
